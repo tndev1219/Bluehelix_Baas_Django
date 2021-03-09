@@ -7,7 +7,8 @@ from django.http import JsonResponse
 from django.conf import settings
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from apps.core.serializers import CountUnusedAddressSerializer, AddDepositAddressSerializer, DepositNotifySerializer
+from apps.core.serializers import CountUnusedAddressSerializer, AddDepositAddressSerializer, \
+    DepositNotifySerializer, SuccessfulWithdrawalNotifySerializer
 from apps.core.utils import create_sign_msg
 
 
@@ -214,6 +215,62 @@ class BaasViewSet(viewsets.ModelViewSet):
                 }, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print('Generate Pending Withdrawal Orders Error: ', e)
+            return JsonResponse({
+                'success': False,
+                'message': serializer.errors,
+                'result': []
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['POST'], serializer_class=SuccessfulWithdrawalNotifySerializer, url_path='successful-withdrawal-notify')
+    def successful_withdrawal_notify(self, request, *args, **kwargs):
+        try:
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            timestamp = str(int(time.time() * 1000))
+
+            data = {
+                "order_id": serializer.validated_data['order_id'],
+                "token_id": serializer.validated_data['token_id'],
+                "to": serializer.validated_data['to'],
+                "amount": serializer.validated_data['amount'],
+                "tx_hash": serializer.validated_data['tx_hash'],
+                "block_height": serializer.validated_data['block_height'],
+                "block_time": serializer.validated_data['block_time'],
+            }
+            if 'memo' in serializer.validated_data:
+                data['memo'] = serializer.validated_data['memo']
+
+            sign_msg = create_sign_msg(
+                "POST", "/api/v1/notify/withdrawal", timestamp, data)
+            sign_msg = sign_msg.encode("utf-8")
+
+            signing_key = ed25519.SigningKey(settings.PRIVATE_KEY.encode("utf-8"), encoding="hex")
+            signature = signing_key.sign(sign_msg)
+
+            headers = {
+                "BWAAS-API-KEY": settings.API_KEY,
+                "BWAAS-API-TIMESTAMP": timestamp,
+                "BWAAS-API-SIGNATURE": hexlify(signature),
+                "Content-Type": "application/json"
+            }
+
+            try:
+                res = requests.post(url=settings.DOMAIN+"/api/v1/notify/withdrawal", data=json.dumps(data),  headers=headers)
+                return JsonResponse(
+                {
+                    'success': True,
+                    'message': 'Success',
+                    'result': res.text,
+                }, status=status.HTTP_200_OK)
+            except ValueError:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Error Occured!',
+                    'result': ValueError
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print('Successful Withdrawal Notify Error: ', e)
             return JsonResponse({
                 'success': False,
                 'message': serializer.errors,

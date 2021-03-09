@@ -24,3 +24,15 @@ class DepositNotifySerializer(serializers.Serializer):
 
 class ResetEmailSerializer(serializers.Serializer):
     reset_email_key = serializers.CharField(required=True)
+
+
+class SuccessfulWithdrawalNotifySerializer(serializers.Serializer):
+    order_id = serializers.CharField(required=True)
+    token_id = serializers.CharField(required=True)
+    to = serializers.CharField(required=True)
+    memo = serializers.CharField(required=False)
+    amount = serializers.CharField(required=True)
+    tx_hash = serializers.CharField(required=True)
+    block_height = serializers.CharField(required=True)
+    block_time = serializers.CharField(required=True)
+    
