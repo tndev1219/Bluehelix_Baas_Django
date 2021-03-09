@@ -10,8 +10,16 @@ class AddDepositAddressSerializer(serializers.Serializer):
     addr_list = serializers.ListField(required=True)
 
 
-class ResetEmailRequestSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
+class DepositNotifySerializer(serializers.Serializer):
+    token_id = serializers.CharField(required=True)
+    where_from = serializers.CharField(required=True)
+    to = serializers.CharField(required=True)
+    memo = serializers.CharField(required=False)
+    amount = serializers.CharField(required=True)
+    tx_hash = serializers.CharField(required=True)
+    index = serializers.CharField(required=True)
+    block_height = serializers.CharField(required=True)
+    block_time = serializers.CharField(required=True)
 
 
 class ResetEmailSerializer(serializers.Serializer):
