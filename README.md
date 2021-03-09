@@ -36,5 +36,5 @@ Create virtualenv
 
 Install requirements for a project.
 
-    cd /var/www/Bluehelix_Baas_Django && pip install -r requirements/requirements.txt
-    sudo chown :www-data /var/www/Bluehelix_Baas_Django
+    cd /var/www/baas && pip install -r requirements/requirements.txt
+    sudo chown :www-data /var/www/baas
