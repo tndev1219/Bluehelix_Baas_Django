@@ -35,4 +35,9 @@ class SuccessfulWithdrawalNotifySerializer(serializers.Serializer):
     tx_hash = serializers.CharField(required=True)
     block_height = serializers.CharField(required=True)
     block_time = serializers.CharField(required=True)
-    
+
+
+class FailedWithdrawalNotifySerializer(serializers.Serializer):
+    order_id = serializers.CharField(required=True)
+    token_id = serializers.CharField(required=True)
+    reason = serializers.CharField(required=True)

@@ -27,8 +27,7 @@ router = DefaultRouter()
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api-auth/', include(('rest_framework.urls', 'rest_framework'), namespace='rest_framework')),
-    url('api/', include(('apps.core.urls', 'core'), namespace='core')),
-    url(r'^api/', include(router.urls)),
+    url(r'^api/', include(('apps.core.urls', 'core'), namespace='core')),
 ]
 
 if settings.DEBUG:
