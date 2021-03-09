@@ -35,9 +35,11 @@ class BaasViewSet(viewsets.ModelViewSet):
 
             try:
                 res = requests.get(url=settings.DOMAIN+path, headers=headers)
-                # print('-------------------------')
-                # print(res.text)
-                # print('-------------------------')
+                print('-------------------------')
+                print(res)
+                print('-------------------------')
+                print(res.text)
+                print('-------------------------')
                 return JsonResponse({
                 'success': True,
                 'message': 'Success',
