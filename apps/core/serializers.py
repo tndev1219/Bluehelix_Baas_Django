@@ -5,9 +5,9 @@ class CountUnusedAddressSerializer(serializers.Serializer):
     chain = serializers.CharField(required=True)
 
 
-class ResetPasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(required=True)
-    repeat_password = serializers.CharField(required=True)
+class AddDepositAddressSerializer(serializers.Serializer):
+    chain = serializers.CharField(required=True)
+    addr_list = serializers.ListField(required=True)
 
 
 class ResetEmailRequestSerializer(serializers.Serializer):
