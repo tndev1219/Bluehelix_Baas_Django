@@ -41,3 +41,10 @@ class FailedWithdrawalNotifySerializer(serializers.Serializer):
     order_id = serializers.CharField(required=True)
     token_id = serializers.CharField(required=True)
     reason = serializers.CharField(required=True)
+
+
+class AssetVerificationSerializer(serializers.Serializer):
+    token_id = serializers.CharField(required=True)
+    total_deposit_amount = serializers.CharField(required=True)
+    total_withdrawal_amount = serializers.CharField(required=True)
+    last_block_height = serializers.CharField(required=True)
