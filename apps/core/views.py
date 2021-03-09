@@ -177,3 +177,45 @@ class BaasViewSet(viewsets.ModelViewSet):
                 'message': serializer.errors,
                 'result': []
             }, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['POST'], serializer_class=CountUnusedAddressSerializer, url_path='generate-pending-withdrawal-orders')
+    def generate_pending_withdrawal_orders(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            timestamp = str(int(time.time() * 1000))
+            path = "/api/v1/withdrawal/orders?chain=" + serializer.validated_data['chain']
+
+            sign_msg = create_sign_msg("GET", path, timestamp, {})
+            sign_msg = sign_msg.encode("utf-8")
+
+            signing_key = ed25519.SigningKey(settings.PRIVATE_KEY.encode("utf-8"), encoding="hex")
+            signature = signing_key.sign(sign_msg)
+
+            headers  = {
+                "BWAAS-API-KEY": settings.API_KEY,
+                "BWAAS-API-TIMESTAMP": timestamp,
+                "BWAAS-API-SIGNATURE": hexlify(signature)
+            }
+
+            try:
+                res = requests.get(url=settings.DOMAIN+path, headers=headers)
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Success',
+                    'result': res.text
+                }, status=status.HTTP_200_OK)
+            except ValueError:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Error Occured!',
+                    'result': ValueError
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print('Generate Pending Withdrawal Orders Error: ', e)
+            return JsonResponse({
+                'success': False,
+                'message': serializer.errors,
+                'result': []
+            }, status=status.HTTP_400_BAD_REQUEST)
