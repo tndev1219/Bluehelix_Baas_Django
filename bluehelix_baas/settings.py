@@ -82,6 +82,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bluehelix_baas.wsgi.application'
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase',
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
